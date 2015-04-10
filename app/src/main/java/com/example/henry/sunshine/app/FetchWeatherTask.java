@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.henry.sunshine.app;
 
 import android.content.ContentUris;
@@ -51,8 +36,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     private boolean DEBUG = true;
 
-
-
     /**
      * Helper method to handle insertion of a new location in the weather database.
      *
@@ -63,6 +46,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
      * @return the row ID of the added location.
      */
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
+        // Students: First, check if the location with this city name exists in the db
+        // If it exists, return the current ID
+        // Otherwise, insert it using the content resolver and the base URI
         long locationId;
         // Students: First, check if the location with this city name exists in the db
         Cursor locationCursor = mContext.getContentResolver().query(
@@ -94,7 +80,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         return locationId;
     }
-
 
     /**
      * Take the String representing the complete forecast in JSON Format and
@@ -234,8 +219,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 cVVector.toArray(cvArray);
 
                 inserted = mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
-            }
 
+            }
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
 
         } catch (JSONException e) {
@@ -317,9 +302,10 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
+            return null;
         } catch (JSONException e) {
-                        Log.e(LOG_TAG, e.getMessage(), e);
-                        e.printStackTrace();
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -333,6 +319,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             }
         }
 
+        // This will only happen if there was an error getting or parsing the forecast.
         return null;
     }
 }
